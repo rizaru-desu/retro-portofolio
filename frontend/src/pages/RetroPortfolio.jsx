@@ -6,7 +6,10 @@ import { soundManager } from '../utils/SoundController';
 import '../styles/pixel-theme.css';
 import { Heart, Zap, Mail, Github, Linkedin, Volume2, VolumeX, Play } from 'lucide-react';
 
+import { useNavigate } from 'react-router-dom';
+
 const RetroPortfolio = () => {
+  const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState('hero');
   const [loading, setLoading] = useState(true);
   const [isMuted, setIsMuted] = useState(false);
