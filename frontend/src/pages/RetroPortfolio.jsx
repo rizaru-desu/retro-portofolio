@@ -286,7 +286,7 @@ const RetroPortfolio = () => {
             
             <div className="space-y-4">
               {portfolioData.logs.map((log) => (
-                <div key={log.id} className="bg-black border-2 border-green-500 p-4 text-green-500 font-mono text-xs md:text-sm hover:bg-green-900/20 cursor-pointer transition-colors" onClick={() => soundManager.playClick()}>
+                <div key={log.id} className="bg-black border-2 border-green-500 p-4 text-green-500 font-mono text-xs md:text-sm hover:bg-green-900/20 cursor-pointer transition-colors" onClick={() => { soundManager.playClick(); navigate(`/logs/${log.id}`); }}>
                   <div className="flex justify-between border-b border-green-800 pb-2 mb-2">
                     <span>FILE_ID: {log.id}</span>
                     <span>DATE: {log.date}</span>
