@@ -81,6 +81,14 @@ export const portfolioData = {
       title: "Defeating the Bug King",
       date: "2024-03-15",
       snippet: "How I solved a critical memory leak in production...",
+      content: `
+        <p>It was a dark and stormy night in the server room. The memory usage graphs were spiking like crazy.</p>
+        <p>I equipped my debugging sword and dived into the heap snapshots. The enemy was elusive, hiding within a closure that refused to let go of its references.</p>
+        <h3>The Battle</h3>
+        <p>After hours of tracing, I found the culprit: a global event listener that was never removed when components unmounted. A classic rookie mistake, but deadly at scale.</p>
+        <h3>The Solution</h3>
+        <p>I implemented a proper cleanup function in the useEffect hook. The memory usage dropped instantly. The kingdom was safe once again.</p>
+      `,
       tags: ["Debugging", "NodeJS"]
     },
     {
@@ -88,6 +96,13 @@ export const portfolioData = {
       title: "New Skill Acquired: Rust",
       date: "2024-02-10",
       snippet: "My journey into low-level programming and memory safety.",
+      content: `
+        <p>I've always relied on the Garbage Collector to clean up my mess. But I wanted more power. I wanted control.</p>
+        <p>Enter Rust. The borrow checker was a harsh mistress at first, rejecting my code at every turn. "You cannot borrow this as mutable!" it screamed.</p>
+        <h3>Leveling Up</h3>
+        <p>Slowly, I began to understand ownership. I learned to love the compiler. It wasn't fighting me; it was protecting me from myself.</p>
+        <p>Now, I can write safe, concurrent code without fear of data races. My power level has increased significantly.</p>
+      `,
       tags: ["Learning", "Rust"]
     },
     {
@@ -95,6 +110,13 @@ export const portfolioData = {
       title: "The Great Migration",
       date: "2024-01-05",
       snippet: "Moving our entire infrastructure from AWS to GCP.",
+      content: `
+        <p>The old castle (AWS) was getting too expensive to maintain. The king ordered a migration to the new lands of Google Cloud.</p>
+        <h3>The Strategy</h3>
+        <p>We used Terraform to map out the new territory. We containerized everything with Docker to ensure the villagers (microservices) could move easily.</p>
+        <h3>The Outcome</h3>
+        <p>The migration took 3 days. We experienced zero downtime. The cost savings were immediate. A successful campaign indeed.</p>
+      `,
       tags: ["DevOps", "Cloud"]
     }
   ],
