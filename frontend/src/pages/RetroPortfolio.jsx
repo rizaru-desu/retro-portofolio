@@ -2,17 +2,35 @@ import React, { useState, useEffect } from 'react';
 import { portfolioData } from '../data/mock';
 import PixelCard from '../components/pixel/PixelCard';
 import PixelButton from '../components/pixel/PixelButton';
+import { soundManager } from '../utils/SoundController';
 import '../styles/pixel-theme.css';
-import { Heart, Zap, Mail, Github, Linkedin, Scroll, Shield, MessageSquare } from 'lucide-react';
+import { Heart, Zap, Mail, Github, Linkedin, Volume2, VolumeX } from 'lucide-react';
 
 const RetroPortfolio = () => {
   const [activeSection, setActiveSection] = useState('hero');
   const [loading, setLoading] = useState(true);
+  const [isMuted, setIsMuted] = useState(false);
 
   useEffect(() => {
     const timer = setTimeout(() => setLoading(false), 2000);
+    // Initialize audio context on first user interaction if needed, 
+    // but we'll do it on button clicks mostly.
     return () => clearTimeout(timer);
   }, []);
+
+  const toggleMute = () => {
+    const muted = soundManager.toggleMute();
+    setIsMuted(muted);
+  };
+
+  const handleNavClick = (section) => {
+    soundManager.playClick();
+    setActiveSection(section);
+  };
+
+  const handleNavHover = () => {
+    soundManager.playHover();
+  };
 
   if (loading) {
     return (
@@ -27,7 +45,8 @@ const RetroPortfolio = () => {
 
   const NavButton = ({ section, label, icon }) => (
     <button 
-      onClick={() => setActiveSection(section)} 
+      onClick={() => handleNavClick(section)}
+      onMouseEnter={handleNavHover}
       className={`hover:text-yellow-400 flex items-center gap-2 ${activeSection === section ? 'text-yellow-400 underline decoration-4 decoration-yellow-400 underline-offset-4' : ''}`}
     >
       {icon && <span className="hidden lg:inline">{icon}</span>}
@@ -51,6 +70,15 @@ const RetroPortfolio = () => {
             <Zap className="w-4 h-4 fill-current" />
             <span>MP {portfolioData.stats.mp}</span>
           </div>
+          
+          {/* Mute Button (Mobile/Desktop) */}
+          <button 
+            onClick={toggleMute}
+            className="ml-4 text-gray-400 hover:text-white"
+            title={isMuted ? "Unmute Sound" : "Mute Sound"}
+          >
+            {isMuted ? <VolumeX size={16} /> : <Volume2 size={16} />}
+          </button>
         </div>
         
         {/* Desktop Nav */}
@@ -93,10 +121,10 @@ const RetroPortfolio = () => {
             </p>
             
             <div className="flex flex-col md:flex-row gap-4">
-              <PixelButton onClick={() => setActiveSection('quests')} variant="primary">
+              <PixelButton onClick={() => handleNavClick('quests')} variant="primary">
                 START GAME
               </PixelButton>
-              <PixelButton onClick={() => setActiveSection('guilds')} variant="warning">
+              <PixelButton onClick={() => handleNavClick('guilds')} variant="warning">
                 VIEW HISTORY
               </PixelButton>
             </div>
@@ -229,7 +257,7 @@ const RetroPortfolio = () => {
             
             <div className="space-y-4">
               {portfolioData.logs.map((log) => (
-                <div key={log.id} className="bg-black border-2 border-green-500 p-4 text-green-500 font-mono text-xs md:text-sm hover:bg-green-900/20 cursor-pointer transition-colors">
+                <div key={log.id} className="bg-black border-2 border-green-500 p-4 text-green-500 font-mono text-xs md:text-sm hover:bg-green-900/20 cursor-pointer transition-colors" onClick={() => soundManager.playClick()}>
                   <div className="flex justify-between border-b border-green-800 pb-2 mb-2">
                     <span>FILE_ID: {log.id}</span>
                     <span>DATE: {log.date}</span>
@@ -313,27 +341,51 @@ const RetroPortfolio = () => {
 
       {/* Mobile Menu Bottom */}
       <div className="md:hidden fixed bottom-0 left-0 right-0 bg-black border-t-4 border-gray-700 p-2 flex justify-between overflow-x-auto z-50 no-scrollbar">
-        <button onClick={() => setActiveSection('hero')} className={`flex flex-col items-center text-[8px] text-white min-w-[50px] ${activeSection === 'hero' ? 'text-yellow-400' : ''}`}>
+        <button 
+          onClick={() => handleNavClick('hero')} 
+          onMouseEnter={handleNavHover}
+          className={`flex flex-col items-center text-[8px] text-white min-w-[50px] ${activeSection === 'hero' ? 'text-yellow-400' : ''}`}
+        >
           <div className="w-6 h-6 bg-gray-800 border border-gray-600 mb-1 flex items-center justify-center">🏠</div>
           HOME
         </button>
-        <button onClick={() => setActiveSection('stats')} className={`flex flex-col items-center text-[8px] text-white min-w-[50px] ${activeSection === 'stats' ? 'text-yellow-400' : ''}`}>
+        <button 
+          onClick={() => handleNavClick('stats')} 
+          onMouseEnter={handleNavHover}
+          className={`flex flex-col items-center text-[8px] text-white min-w-[50px] ${activeSection === 'stats' ? 'text-yellow-400' : ''}`}
+        >
           <div className="w-6 h-6 bg-gray-800 border border-gray-600 mb-1 flex items-center justify-center">📊</div>
           STATS
         </button>
-        <button onClick={() => setActiveSection('guilds')} className={`flex flex-col items-center text-[8px] text-white min-w-[50px] ${activeSection === 'guilds' ? 'text-yellow-400' : ''}`}>
+        <button 
+          onClick={() => handleNavClick('guilds')} 
+          onMouseEnter={handleNavHover}
+          className={`flex flex-col items-center text-[8px] text-white min-w-[50px] ${activeSection === 'guilds' ? 'text-yellow-400' : ''}`}
+        >
           <div className="w-6 h-6 bg-gray-800 border border-gray-600 mb-1 flex items-center justify-center">🏰</div>
           GUILDS
         </button>
-        <button onClick={() => setActiveSection('quests')} className={`flex flex-col items-center text-[8px] text-white min-w-[50px] ${activeSection === 'quests' ? 'text-yellow-400' : ''}`}>
+        <button 
+          onClick={() => handleNavClick('quests')} 
+          onMouseEnter={handleNavHover}
+          className={`flex flex-col items-center text-[8px] text-white min-w-[50px] ${activeSection === 'quests' ? 'text-yellow-400' : ''}`}
+        >
           <div className="w-6 h-6 bg-gray-800 border border-gray-600 mb-1 flex items-center justify-center">⚔️</div>
           QUESTS
         </button>
-        <button onClick={() => setActiveSection('logs')} className={`flex flex-col items-center text-[8px] text-white min-w-[50px] ${activeSection === 'logs' ? 'text-yellow-400' : ''}`}>
+        <button 
+          onClick={() => handleNavClick('logs')} 
+          onMouseEnter={handleNavHover}
+          className={`flex flex-col items-center text-[8px] text-white min-w-[50px] ${activeSection === 'logs' ? 'text-yellow-400' : ''}`}
+        >
           <div className="w-6 h-6 bg-gray-800 border border-gray-600 mb-1 flex items-center justify-center">📜</div>
           LOGS
         </button>
-        <button onClick={() => setActiveSection('reputation')} className={`flex flex-col items-center text-[8px] text-white min-w-[50px] ${activeSection === 'reputation' ? 'text-yellow-400' : ''}`}>
+        <button 
+          onClick={() => handleNavClick('reputation')} 
+          onMouseEnter={handleNavHover}
+          className={`flex flex-col items-center text-[8px] text-white min-w-[50px] ${activeSection === 'reputation' ? 'text-yellow-400' : ''}`}
+        >
           <div className="w-6 h-6 bg-gray-800 border border-gray-600 mb-1 flex items-center justify-center">💬</div>
           CHAT
         </button>

@@ -1,4 +1,5 @@
 import React from 'react';
+import { soundManager } from '../utils/SoundController';
 
 const PixelButton = ({ children, onClick, variant = "primary", className = "" }) => {
   const colors = {
@@ -6,13 +7,24 @@ const PixelButton = ({ children, onClick, variant = "primary", className = "" })
     danger: "bg-red-600 hover:bg-red-700 border-red-800",
     success: "bg-green-600 hover:bg-green-700 border-green-800",
     warning: "bg-yellow-500 hover:bg-yellow-600 border-yellow-700",
+    secondary: "bg-gray-600 hover:bg-gray-700 border-gray-800",
   };
 
   const baseColor = colors[variant] || colors.primary;
 
+  const handleMouseEnter = () => {
+    soundManager.playHover();
+  };
+
+  const handleClick = (e) => {
+    soundManager.playClick();
+    if (onClick) onClick(e);
+  };
+
   return (
     <button
-      onClick={onClick}
+      onMouseEnter={handleMouseEnter}
+      onClick={handleClick}
       className={`
         relative inline-flex items-center justify-center
         px-6 py-3 
