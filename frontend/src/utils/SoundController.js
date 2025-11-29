@@ -4,6 +4,9 @@ class RetroSound {
     this.context = null;
     this.muted = false;
     this.initialized = false;
+    this.bgmNodes = [];
+    this.bgmInterval = null;
+    this.isBgmPlaying = false;
   }
 
   init() {
@@ -12,7 +15,6 @@ class RetroSound {
       this.context = new AudioContext();
       this.initialized = true;
     }
-    // Resume context if suspended (browser policy)
     if (this.context && this.context.state === 'suspended') {
       this.context.resume();
     }
@@ -20,6 +22,13 @@ class RetroSound {
 
   toggleMute() {
     this.muted = !this.muted;
+    if (this.muted) {
+      this.stopBGM();
+    } else {
+      if (this.isBgmPlaying) {
+        this.startBGM();
+      }
+    }
     return this.muted;
   }
 
@@ -44,14 +53,11 @@ class RetroSound {
 
   playHover() {
     this.init();
-    // High pitched short blip
     this.playTone(440, 'square', 0.05, 0.05);
   }
 
   playClick() {
     this.init();
-    // "Coin" style sound or selection sound
-    // Two tones in quick succession
     if (this.muted || !this.context) return;
     
     const now = this.context.currentTime;
@@ -79,10 +85,66 @@ class RetroSound {
     osc2.stop(now + 0.15);
   }
 
-  playBack() {
-    this.init();
-    // Lower pitch cancel sound
-    this.playTone(150, 'sawtooth', 0.15, 0.1);
+  // Simple 8-bit Arpeggio BGM
+  startBGM() {
+    this.isBgmPlaying = true;
+    if (this.muted || !this.initialized) return;
+
+    this.stopBGM(false); // Clear existing interval but keep playing state
+
+    const sequence = [
+      { f: 110.00, d: 0.2 }, // A2
+      { f: 130.81, d: 0.2 }, // C3
+      { f: 164.81, d: 0.2 }, // E3
+      { f: 196.00, d: 0.2 }, // G3
+    ];
+    
+    let noteIndex = 0;
+
+    const playNextNote = () => {
+      if (!this.isBgmPlaying || this.muted) return;
+      
+      const note = sequence[noteIndex];
+      
+      const osc = this.context.createOscillator();
+      const gain = this.context.createGain();
+      
+      osc.type = 'triangle'; // Softer than square for BGM
+      osc.frequency.setValueAtTime(note.f, this.context.currentTime);
+      
+      // Low volume for background
+      gain.gain.setValueAtTime(0.03, this.context.currentTime);
+      gain.gain.linearRampToValueAtTime(0.03, this.context.currentTime + note.d - 0.05);
+      gain.gain.exponentialRampToValueAtTime(0.001, this.context.currentTime + note.d);
+      
+      osc.connect(gain);
+      gain.connect(this.context.destination);
+      
+      osc.start();
+      osc.stop(this.context.currentTime + note.d);
+      
+      this.bgmNodes.push(osc);
+      
+      noteIndex = (noteIndex + 1) % sequence.length;
+    };
+
+    playNextNote();
+    this.bgmInterval = setInterval(playNextNote, 250); // 4 notes per second (approx 120 BPM)
+  }
+
+  stopBGM(fullyStop = true) {
+    if (this.bgmInterval) {
+      clearInterval(this.bgmInterval);
+      this.bgmInterval = null;
+    }
+    this.bgmNodes.forEach(node => {
+      try { node.stop(); } catch(e) {}
+    });
+    this.bgmNodes = [];
+    
+    if (fullyStop) {
+      this.isBgmPlaying = false;
+    }
   }
 }
 

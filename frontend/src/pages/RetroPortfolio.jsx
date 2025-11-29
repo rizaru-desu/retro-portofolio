@@ -4,23 +4,29 @@ import PixelCard from '../components/pixel/PixelCard';
 import PixelButton from '../components/pixel/PixelButton';
 import { soundManager } from '../utils/SoundController';
 import '../styles/pixel-theme.css';
-import { Heart, Zap, Mail, Github, Linkedin, Volume2, VolumeX } from 'lucide-react';
+import { Heart, Zap, Mail, Github, Linkedin, Volume2, VolumeX, Play } from 'lucide-react';
 
 const RetroPortfolio = () => {
   const [activeSection, setActiveSection] = useState('hero');
   const [loading, setLoading] = useState(true);
   const [isMuted, setIsMuted] = useState(false);
+  const [hasInteracted, setHasInteracted] = useState(false);
 
   useEffect(() => {
     const timer = setTimeout(() => setLoading(false), 2000);
-    // Initialize audio context on first user interaction if needed, 
-    // but we'll do it on button clicks mostly.
     return () => clearTimeout(timer);
   }, []);
 
   const toggleMute = () => {
     const muted = soundManager.toggleMute();
     setIsMuted(muted);
+  };
+
+  const handleStart = () => {
+    soundManager.init();
+    soundManager.playClick();
+    soundManager.startBGM();
+    setHasInteracted(true);
   };
 
   const handleNavClick = (section) => {
@@ -38,6 +44,26 @@ const RetroPortfolio = () => {
         <div className="mb-8 text-2xl animate-pulse">LOADING CARTRIDGE...</div>
         <div className="w-64 h-8 border-4 border-white p-1">
           <div className="h-full bg-green-500 animate-[width_2s_ease-in-out_forwards]" style={{ width: '100%' }}></div>
+        </div>
+      </div>
+    );
+  }
+
+  // Initial "Press Start" Screen to handle Audio Context policy
+  if (!hasInteracted) {
+    return (
+      <div className="min-h-screen bg-slate-900 font-pixel text-white flex flex-col items-center justify-center relative overflow-hidden">
+        <div className="scanlines"></div>
+        <div className="z-10 text-center animate-in zoom-in duration-500">
+          <h1 className="text-4xl md:text-6xl mb-8 text-shadow-pixel text-yellow-400">
+            {portfolioData.hero.name.split(' ')[0]}'S<br/>ADVENTURE
+          </h1>
+          <div className="animate-bounce">
+            <PixelButton onClick={handleStart} variant="success" className="text-lg px-8 py-4">
+              <Play className="mr-2 w-4 h-4" /> PRESS START
+            </PixelButton>
+          </div>
+          <p className="mt-8 text-gray-500 text-xs">ENABLES AUDIO EXPERIENCE</p>
         </div>
       </div>
     );
@@ -71,7 +97,7 @@ const RetroPortfolio = () => {
             <span>MP {portfolioData.stats.mp}</span>
           </div>
           
-          {/* Mute Button (Mobile/Desktop) */}
+          {/* Mute Button */}
           <button 
             onClick={toggleMute}
             className="ml-4 text-gray-400 hover:text-white"
@@ -83,7 +109,7 @@ const RetroPortfolio = () => {
         
         {/* Desktop Nav */}
         <div className="hidden md:flex gap-6 flex-wrap justify-center">
-          <NavButton section="hero" label="START" />
+          <NavButton section="hero" label="HOME" />
           <NavButton section="stats" label="STATS" />
           <NavButton section="guilds" label="GUILDS" />
           <NavButton section="quests" label="QUESTS" />
