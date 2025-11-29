@@ -1,5 +1,5 @@
 import React from 'react';
-import { soundManager } from '../utils/SoundController';
+import { soundManager } from '../../utils/SoundController';
 
 const PixelButton = ({ children, onClick, variant = "primary", className = "" }) => {
   const colors = {
